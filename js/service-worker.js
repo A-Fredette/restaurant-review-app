@@ -6,7 +6,6 @@ self.addEventListener('GET', function(event) {
   console.log(event.request);
 });
 
-/*
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open('staticCache').then(function(cache) {
@@ -35,4 +34,3 @@ self.addEventListener(fetch, function(event) {
   event.respondWith(
     cache.match(event.request));
 });
-*/
