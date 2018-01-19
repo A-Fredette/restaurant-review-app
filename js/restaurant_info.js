@@ -1,5 +1,6 @@
 let restaurant;
 var map;
+let index = 2;
 
 /**
  * Initialize Google map, called from HTML.
@@ -18,6 +19,17 @@ window.initMap = () => {
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
     }
   });
+};
+
+/**
+ * Add restaurant name to the breadcrumb navigation menu
+ */
+fillBreadcrumb = (restaurant=self.restaurant) => {
+  const breadcrumb = document.getElementById('breadcrumb');
+  const li = document.createElement('li');
+  li.innerHTML = restaurant.name;
+  breadcrumb.appendChild(li);
+  li.tabIndex = 1;
 };
 
 /**
@@ -51,12 +63,15 @@ fetchRestaurantFromURL = (callback) => {
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
+  addTabIndex(name);
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
+  addTabIndex(address);
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img';
+  image.alt = restaurant.name + " Restaurant";
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
 
   const cuisine = document.getElementById('restaurant-cuisine');
@@ -76,7 +91,9 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
   for (let key in operatingHours) {
+
     const row = document.createElement('tr');
+    addTabIndex(row);
 
     const day = document.createElement('td');
     day.innerHTML = key;
@@ -98,6 +115,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
+  addTabIndex(title);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -120,30 +138,24 @@ createReviewHTML = (review) => {
   const name = document.createElement('p');
   name.innerHTML = review.name;
   li.appendChild(name);
+  addTabIndex(name);
 
   const date = document.createElement('p');
   date.innerHTML = review.date;
   li.appendChild(date);
+  addTabIndex(date);
 
   const rating = document.createElement('p');
   rating.innerHTML = `Rating: ${review.rating}`;
   li.appendChild(rating);
+  addTabIndex(rating);
 
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
   li.appendChild(comments);
+  addTabIndex(comments);
 
   return li;
-};
-
-/**
- * Add restaurant name to the breadcrumb navigation menu
- */
-fillBreadcrumb = (restaurant=self.restaurant) => {
-  const breadcrumb = document.getElementById('breadcrumb');
-  const li = document.createElement('li');
-  li.innerHTML = restaurant.name;
-  breadcrumb.appendChild(li);
 };
 
 /**
@@ -160,4 +172,12 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+};
+
+/**
+ * Add an icremental tab index to a given element.
+ */
+addTabIndex = (element) => {
+  element.tabIndex = index;
+  index++;
 };
