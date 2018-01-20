@@ -1,6 +1,5 @@
 let restaurant;
 var map;
-let index = 2;
 
 /**
  * Initialize Google map, called from HTML.
@@ -29,7 +28,6 @@ fillBreadcrumb = (restaurant=self.restaurant) => {
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
   breadcrumb.appendChild(li);
-  li.tabIndex = 1;
 };
 
 /**
@@ -63,11 +61,9 @@ fetchRestaurantFromURL = (callback) => {
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
-  addTabIndex(name);
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
-  addTabIndex(address);
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img';
@@ -91,13 +87,16 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
   for (let key in operatingHours) {
+    let index = 4;
 
     const row = document.createElement('tr');
-    addTabIndex(row);
+    row.tabIndex = index;
+    index++;
 
     const day = document.createElement('td');
     day.innerHTML = key;
     row.appendChild(day);
+
 
     const time = document.createElement('td');
     time.innerHTML = operatingHours[key];
@@ -115,7 +114,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
-  addTabIndex(title);
+  title.tabIndex = 15;
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -136,24 +135,25 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 createReviewHTML = (review) => {
   const li = document.createElement('li');
   const name = document.createElement('p');
+  let reviewIndex = 20;
   name.innerHTML = review.name;
   li.appendChild(name);
-  addTabIndex(name);
+  addTabIndex(name, reviewIndex);
 
   const date = document.createElement('p');
   date.innerHTML = review.date;
   li.appendChild(date);
-  addTabIndex(date);
+  addTabIndex(date, reviewIndex);
 
   const rating = document.createElement('p');
   rating.innerHTML = `Rating: ${review.rating}`;
   li.appendChild(rating);
-  addTabIndex(rating);
+  addTabIndex(rating, reviewIndex);
 
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
   li.appendChild(comments);
-  addTabIndex(comments);
+  addTabIndex(comments, reviewIndex);
 
   return li;
 };
@@ -177,7 +177,7 @@ getParameterByName = (name, url) => {
 /**
  * Add an icremental tab index to a given element.
  */
-addTabIndex = (element) => {
+addTabIndex = (element, index) => {
   element.tabIndex = index;
-  index++;
+  return index++;
 };

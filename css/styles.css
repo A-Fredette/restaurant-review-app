@@ -364,3 +364,44 @@ nav h1 a {
         width: 100%;
     }
 }
+
+@media screen and (max-width: 690px) {
+    .inside #map-container {
+      width: 100%;
+      height: 400px;
+      display: block;
+      position: relative;
+      margin: 44px 0 25px 0;
+      top: 0;
+    }
+
+    .inside #breadcrumb {
+      width: 100%;
+      background-color: #666; /*  \**/
+      padding-top: 3px;
+    }
+
+    .inside #breadcrumb li {
+      color: #fff;
+      letter-spacing: .1em;
+    }
+  
+    .inside #breadcrumb li a {
+      color: #53a8f1
+    }
+
+    .inside #restaurant-container, 
+    .inside #reviews-container {
+      width: 100%;
+      margin-left: 4%;
+    }
+
+    .inside #reviews-list li {
+      margin: 4% 10px;
+      padding: 2%;
+    }
+
+    .inside #restaurant-name {
+      margin-top: 5px;
+    }
+}
