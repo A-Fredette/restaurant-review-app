@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
   registerServiceWorker();
+  //fetchNewServer();
 });
 
 /**
@@ -19,7 +20,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
  registerServiceWorker = () => {
   if (!navigator.serviceWorker) return;
 
-// TO DO: Convert to arrow function
+/*fetchNewServer = () => {
+  console.log('new server called')
+  fetch(`http://localhost:1337/restaurants`,
+    { method: 'GET'})
+    .then(response => {
+      return response.json()})
+    .then(response => console.log('json response ', response))
+    .catch(error => console.log(error))
+}*/
+
+//TO DO: Convert to arrow function
   navigator.serviceWorker.register('/js/service-worker.js').then(function(registration) {
     console.log('Service Worker Registered', registration);
   }).catch(function(error){
