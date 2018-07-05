@@ -154,7 +154,13 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    if (restaurant.photograph) {
+      return (`../img/${restaurant.photograph}.jpg`);
+    }
+    else {
+      return (`../img/10.jpg`);
+    }
+
   }
 
   /**
