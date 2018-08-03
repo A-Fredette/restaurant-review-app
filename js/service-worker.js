@@ -1,6 +1,5 @@
 // Only caching needs to be implemented, no other ServiceWorker features.
 
-
 // this doesn't seem to be working ..
 self.addEventListener('GET', function(event) {
   console.log(event.request);
@@ -24,7 +23,9 @@ self.addEventListener('install', function(event) {
         '/img/9.jpg',
         '/img/10.jpg',
         'main.js',
+        'idb.js.js',
         'dbhelper.js',
+        'indexeddb.js',
         'restaurant_info.js']);
       })
   );

@@ -1,17 +1,57 @@
-
-var promiseDB = idb.open('test-db', 1, function(upgradeDb) { // creates 'test-db' Database
-    //switch(upgradeDb.oldVersion) {
-    //case 0: //no break lines with these switch statements
-     var keyValStore = upgradeDb.createObjectStore('keyval'); //creates a Object Store 'keyval'
-      keyValStore.put("world", "hello"); //inserts a key and value pair. 2nd argument (hello) is the key
-    //case 1:
-      //upgradeDb.createObjectStore('people', { keyPath: 'name' });
-    //case 2:
-      //var peopleStore = upgradeDb.transaction.objectStore('people');
+let promiseDB = idb.open('test-db', 1, function(upgradeDb) { // creates 'test-db' Database
+    switch(upgradeDb.oldVersion) {
+    case 0: //no break lines with these switch statements
+      let ndb = upgradeDb.createObjectStore('neighborhoods', { keyPath: 'neighborhood' });
+    case 1:
+      let cusisines = upgradeDb.createObjectStore('cuisines');
       //peopleStore.createIndex('animal', 'favoriteAnimal');
-    //case 3:
-      //peopleStore = upgradeDb.transaction.objectStore('people');
-      //peopleStore.createIndex('age', 'age');
+    case 2:
+      let restaurants = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+      restaurants.createIndex('by neighborhood', 'neighborhood');
+      restaurants.createIndex('by cusisine', 'cuisine_type');
+    }
   });
 
-console.log('indexDB file reporting');
+/**
+  * Write DB with key pre-set
+  */
+writeDatabaseKP = (database, value) => {
+  promiseDB.then(function(db) {
+  const tx = db.transaction(database, 'readwrite');
+  const neighborhoodStore = tx.objectStore(database);
+  neighborhoodStore.put(value);
+  return tx.complete; //promise that fullfills if and when the transaction completes and rejects if it fails
+  }).then(function(result){
+    return;
+    //console.log('value added');
+  });
+};
+
+/**
+  * Write DB with key specified
+  */
+writeDatabaseKey = (database, value, key) => {
+  promiseDB.then(function(db) {
+  const tx = db.transaction(database, 'readwrite');
+  const neighborhoodStore = tx.objectStore(database);
+  neighborhoodStore.put(value, key);
+  return tx.complete; //promise that fullfills if and when the transaction completes and rejects if it fails
+  }).then(function(result) {
+    return;
+    //console.log('value added');
+  });
+};
+
+ /**
+   * Get all information from a database
+   */
+readDatabase = (database) => {
+  promiseDB.then(function(db) {
+    const tx = db.transaction(database, 'readonly')
+    const restaurantInfo = tx.objectStore(database)
+    let data = restaurantInfo.getAll()
+    console.log('reading DB: ', data)
+  }).then(function(data) {
+    return data;
+  });
+}

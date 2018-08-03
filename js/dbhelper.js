@@ -8,15 +8,12 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    // Part One Server
-     //const port = 8000;// Change this to your server port
-    //return `http://localhost:${port}/data/restaurants.json`;
-    const port = 1337;// Change this to your server port
+    const port = 1337; //Server port
     return `http://localhost:${port}/restaurants`;
   }
 
   /**
-   * Fetch all restaurants.
+   * Fetch all restaurants from server/
    */
   static fetchRestaurants(callback) {
     let xhr = new XMLHttpRequest();
@@ -24,12 +21,24 @@ class DBHelper {
     xhr.onload = () => {
       if (xhr.status === 200) { // Got a success response from server!
         const json = JSON.parse(xhr.responseText);
-        console.log(json);
         const restaurants = json;
+
+        json.forEach( location => {
+          writeDatabaseKP('restaurants', location) //writes restaurants into indexedDb
+        });
+
         callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
+      } else { // Server error
         const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
+
+        //read data from indexedDB
+        if (readDatabase('restaurants')) {
+          console.log('success form IDB')
+          callback(null, restaurants);
+        } else {
+          console.log('server fail, idb fail')
+          callback(error, null);
+        }
       }
     };
     xhr.send();

@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
   registerServiceWorker();
-  //fetchNewServer();
 });
 
 /**
@@ -20,20 +19,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
  registerServiceWorker = () => {
   if (!navigator.serviceWorker) return;
 
-/*fetchNewServer = () => {
-  console.log('new server called')
-  fetch(`http://localhost:1337/restaurants`,
-    { method: 'GET'})
-    .then(response => {
-      return response.json()})
-    .then(response => console.log('json response ', response))
-    .catch(error => console.log(error))
-}*/
-
-//TO DO: Convert to arrow function
-  navigator.serviceWorker.register('/js/service-worker.js').then(function(registration) {
+  navigator.serviceWorker.register('/js/service-worker.js')
+  .then(function(registration) {
     console.log('Service Worker Registered', registration);
-  }).catch(function(error){
+  }).catch(function(error) {
     console.log('Service Worker Registration Failed', error);
   });
  };
@@ -47,6 +36,11 @@ fetchNeighborhoods = () => {
       console.error(error);
     } else {
       self.neighborhoods = neighborhoods;
+      for (let location in neighborhoods) {
+        console.log(neighborhoods[location]);
+        let writeValue = {neighborhood: neighborhoods[location]};
+        writeDatabaseKP('neighborhoods', writeValue);
+      }
       fillNeighborhoodsHTML();
     }
   });
@@ -74,6 +68,9 @@ fetchCuisines = () => {
       console.error(error);
     } else {
       self.cuisines = cuisines;
+      cuisines.forEach(cuisine => {
+        writeDatabaseKey('cuisines', cuisine, cuisine);
+      });
       fillCuisinesHTML();
     }
   });
