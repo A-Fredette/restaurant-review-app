@@ -55,3 +55,17 @@ readDatabase = (database) => {
     return data;
   });
 }
+
+/**
+  * "Count the database
+  */
+countDatabase = (database) => {
+ promiseDB.then(function(db) {
+   const tx = db.transaction(database, 'readonly')
+   const restaurantInfo = tx.objectStore(database)
+   let data = restaurantInfo.count()
+   console.log('count: ', data)
+ }).then(function(data) {
+   return data;
+ });
+}

@@ -37,7 +37,6 @@ fetchNeighborhoods = () => {
     } else {
       self.neighborhoods = neighborhoods;
       for (let location in neighborhoods) {
-        console.log(neighborhoods[location]);
         let writeValue = {neighborhood: neighborhoods[location]};
         writeDatabaseKP('neighborhoods', writeValue);
       }

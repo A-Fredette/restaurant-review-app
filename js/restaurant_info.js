@@ -34,6 +34,7 @@ fillBreadcrumb = (restaurant=self.restaurant) => {
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = (callback) => {
+  console.log('self referes to...', self)
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant);
     return;
