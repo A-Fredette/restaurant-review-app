@@ -27,23 +27,26 @@ document.addEventListener('DOMContentLoaded', (event) => {
   });
  };
 
+ /**
+ * F
+ */
+
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-    if (error) { // Got an error
-      console.error(error);
-    } else {
-      self.neighborhoods = neighborhoods;
-      for (let location in neighborhoods) {
-        let writeValue = {neighborhood: neighborhoods[location]};
-        writeDatabaseKP('neighborhoods', writeValue);
+  console.log('main fetchNeighborhoods called');
+  DBHelper.fetchNeighborhoods()
+  .then(results => {
+    self.neighborhoods = results;
+    console.log('self.neighborhoods: ', self.neighborhoods);
+    for (let location in neighborhoods) {
+      let writeValue = {neighborhood: neighborhoods[location]};
+      writeDatabaseKP('neighborhoods', writeValue);
       }
-      fillNeighborhoodsHTML();
-    }
-  });
-};
+    fillNeighborhoodsHTML();
+    }).catch(error => console.log(error));
+  };
 
 /**
  * Set neighborhoods HTML.
@@ -62,17 +65,15 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      self.cuisines = cuisines;
-      cuisines.forEach(cuisine => {
-        writeDatabaseKey('cuisines', cuisine, cuisine);
-      });
-      fillCuisinesHTML();
-    }
-  });
+  DBHelper.fetchCuisines()
+  .then(results => {
+    self.cuisines = results;
+    console.log('self.cuisines: ',self.cuisines);
+    self.cuisines.forEach(cuisine => {
+      writeDatabaseKey('cuisines', cuisine, cuisine);
+    });
+    fillCuisinesHTML();
+  }).catch(error => console.log(error));
 };
 
 /**
@@ -118,14 +119,11 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      resetRestaurants(restaurants);
-      fillRestaurantsHTML();
-    }
-  });
+  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+  .then(results => {
+    resetRestaurants(restaurants);
+    fillRestaurantsHTML();
+  }).catch(error => console.log(error));
 };
 
 /**
@@ -148,10 +146,15 @@ resetRestaurants = (restaurants) => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
+  DBHelper.fetchRestaurants()
+  .then(results => {
+    self.restaurants = results;
+    console.log('self.restaurants :', self.restaurants);
+    self.restaurants.forEach(restaurant => {
+      ul.append(createRestaurantHTML(restaurant));
+    });
   addMarkersToMap();
+  }).catch(error => console.log(error));
 };
 
 /**

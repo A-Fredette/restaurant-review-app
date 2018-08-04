@@ -5,8 +5,9 @@ var map;
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+  console.log('init map called');
   fetchRestaurantFromURL((error, restaurant) => {
-    if (error) { // Got an error!
+    if ('initialization error: ', error) { // Got an error!
       console.error(error);
     } else {
       self.map = new google.maps.Map(document.getElementById('map'), {
@@ -24,6 +25,8 @@ window.initMap = () => {
  * Add restaurant name to the breadcrumb navigation menu
  */
 fillBreadcrumb = (restaurant=self.restaurant) => {
+  console.log('fill breadcrumb called');
+  console.log('restaurant var: ', restaurant);
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
@@ -34,7 +37,7 @@ fillBreadcrumb = (restaurant=self.restaurant) => {
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = (callback) => {
-  console.log('self referes to...', self)
+  console.log('self referes to...', self);
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant);
     return;
