@@ -5,18 +5,9 @@ var map;
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-  console.log('init map called');
   fetchRestaurantFromURL((error, restaurant) => {
     if ('initialization error: ', error) { // Got an error!
       console.error(error);
-    } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
-      });
-      fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
     }
   });
 };
@@ -25,8 +16,6 @@ window.initMap = () => {
  * Add restaurant name to the breadcrumb navigation menu
  */
 fillBreadcrumb = (restaurant=self.restaurant) => {
-  console.log('fill breadcrumb called');
-  console.log('restaurant var: ', restaurant);
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
@@ -37,7 +26,6 @@ fillBreadcrumb = (restaurant=self.restaurant) => {
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = (callback) => {
-  console.log('self referes to...', self);
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant);
     return;
@@ -47,17 +35,22 @@ fetchRestaurantFromURL = (callback) => {
     error = 'No restaurant id in URL';
     callback(error, null);
   } else {
-    DBHelper.fetchRestaurantById(id, (error, restaurant) => {
-      self.restaurant = restaurant;
-      if (!restaurant) {
-        console.error(error);
-        return;
-      }
-      fillRestaurantHTML();
-      callback(null, restaurant);
+    return new Promise((resolve, reject) => {
+      DBHelper.fetchRestaurantById(id)
+      .then(restaurant => {
+        self.restaurant = restaurant;
+        fillRestaurantHTML();
+        self.map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 16,
+        center: restaurant.latlng,
+        scrollwheel: false
+      });
+      fillBreadcrumb();
+      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+      });
     });
   }
-};
+};  
 
 /**
  * Create restaurant HTML and add it to the webpage
@@ -70,7 +63,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img';
+  image.className = 'restaurant-img lazy';
   image.alt = restaurant.name + " Restaurant";
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
 
@@ -91,16 +84,13 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
   for (let key in operatingHours) {
-    let index = 4;
 
     const row = document.createElement('tr');
-    row.tabIndex = index;
-    index++;
+    row.tabIndex = 0;
 
     const day = document.createElement('td');
     day.innerHTML = key;
     row.appendChild(day);
-
 
     const time = document.createElement('td');
     time.innerHTML = operatingHours[key];
@@ -118,7 +108,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
-  title.tabIndex = 15;
+  title.tabIndex = 0;
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -142,22 +132,22 @@ createReviewHTML = (review) => {
   let reviewIndex = 20;
   name.innerHTML = review.name;
   li.appendChild(name);
-  addTabIndex(name, reviewIndex);
+  addTabIndex(name);
 
   const date = document.createElement('p');
   date.innerHTML = review.date;
   li.appendChild(date);
-  addTabIndex(date, reviewIndex);
+  addTabIndex(date);
 
   const rating = document.createElement('p');
   rating.innerHTML = `Rating: ${review.rating}`;
   li.appendChild(rating);
-  addTabIndex(rating, reviewIndex);
+  addTabIndex(rating);
 
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
   li.appendChild(comments);
-  addTabIndex(comments, reviewIndex);
+  addTabIndex(comments);
 
   return li;
 };
@@ -179,9 +169,8 @@ getParameterByName = (name, url) => {
 };
 
 /**
- * Add an icremental tab index to a given element.
+ * Add tab index to a given element
  */
-addTabIndex = (element, index) => {
-  element.tabIndex = index;
-  return index++;
+addTabIndex = (element) => {
+  element.tabIndex = 0;
 };

@@ -8,9 +8,40 @@ var markers = [];
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
-  registerServiceWorker();
+});
+
+
+ /**
+ * LAZY LOADING!!!
+ */
+window.addEventListener('load', (event) => { 
+
+  var lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+
+  if ("IntersectionObserver" in window) {
+    let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          let lazyImage = entry.target;
+          lazyImage.src = lazyImage.dataset.src;
+          lazyImage.srcset = lazyImage.dataset.srcset;
+          lazyImage.classList.remove("lazy");
+          lazyImageObserver.unobserve(lazyImage);
+        }
+      });
+    });
+
+    lazyImages.forEach(function(lazyImage) {
+      lazyImageObserver.observe(lazyImage);
+    });
+  }
+
+  //set a title for iFrame (accessibility)
+  document.getElementsByTagName('iframe')[0].setAttribute('title', 'Google Map');
+
 });
 
 /**
@@ -19,31 +50,21 @@ document.addEventListener('DOMContentLoaded', (event) => {
  registerServiceWorker = () => {
   if (!navigator.serviceWorker) return;
 
-  navigator.serviceWorker.register('/js/service-worker.js')
-  .then(function(registration) {
+  navigator.serviceWorker.register('../service-worker.js')
+  .then(registration => {
     console.log('Service Worker Registered', registration);
-  }).catch(function(error) {
+  }).catch(error => {
     console.log('Service Worker Registration Failed', error);
   });
  };
-
- /**
- * F
- */
 
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  console.log('main fetchNeighborhoods called');
   DBHelper.fetchNeighborhoods()
   .then(results => {
     self.neighborhoods = results;
-    console.log('self.neighborhoods: ', self.neighborhoods);
-    for (let location in neighborhoods) {
-      let writeValue = {neighborhood: neighborhoods[location]};
-      writeDatabaseKP('neighborhoods', writeValue);
-      }
     fillNeighborhoodsHTML();
     }).catch(error => console.log(error));
   };
@@ -68,10 +89,6 @@ fetchCuisines = () => {
   DBHelper.fetchCuisines()
   .then(results => {
     self.cuisines = results;
-    console.log('self.cuisines: ',self.cuisines);
-    self.cuisines.forEach(cuisine => {
-      writeDatabaseKey('cuisines', cuisine, cuisine);
-    });
     fillCuisinesHTML();
   }).catch(error => console.log(error));
 };
@@ -103,6 +120,7 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
+
   updateRestaurants();
 };
 
@@ -149,7 +167,6 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   DBHelper.fetchRestaurants()
   .then(results => {
     self.restaurants = results;
-    console.log('self.restaurants :', self.restaurants);
     self.restaurants.forEach(restaurant => {
       ul.append(createRestaurantHTML(restaurant));
     });
@@ -161,37 +178,43 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  * Create restaurant HTML.
  */
 createRestaurantHTML = (restaurant) => {
-  let cardIndex = 10;
+  let servedImage = `${DBHelper.imageUrlForRestaurant(restaurant)}`;
+  let image400 = servedImage.replace('.jpg', '-400.jpg');
+  let image250 = servedImage.replace('.jpg', '-250.jpg');
 
   const li = document.createElement('li');
 
   const image = document.createElement('img');
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.className = 'restaurant-img lazy';
+  image.src = 'https://via.placeholder.com/350x150';
+  image.setAttribute('data-src', servedImage);
+  image.setAttribute('data-srcset', image400+' 400w, ' +image250+' 250w'  );
+  image.setAttribute('sizes', "(max-width: 320px) 280px, (max-width: 480px) 440px, 800px");
+
   image.alt = restaurant.name + " Restaurant";
   li.append(image);
-  addTabIndex(image, cardIndex);
+  addTabIndex(image);
 
   const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
-  addTabIndex(name, cardIndex);
+  addTabIndex(name);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
   li.append(neighborhood);
-  addTabIndex(neighborhood, cardIndex);
+  addTabIndex(neighborhood);
 
   const address = document.createElement('p');
   address.innerHTML = restaurant.address;
   li.append(address);
-  addTabIndex(address, cardIndex);
+  addTabIndex(address);
 
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more);
-  addTabIndex(more, cardIndex);
+  addTabIndex(more);
 
   return li;
 };
@@ -211,9 +234,8 @@ addMarkersToMap = (restaurants = self.restaurants) => {
 };
 
 /**
- * Add an icremental tab index to a given element.
+ * Add tab index to a given element
  */
-addTabIndex = (element, index) => {
-  element.tabIndex = index;
-  return index++;
+addTabIndex = (element) => {
+  element.tabIndex = 0;
 };
