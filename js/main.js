@@ -184,6 +184,18 @@ createRestaurantHTML = (restaurant) => {
 
   const li = document.createElement('li');
 
+  const favoriteButton = document.createElement('button');
+  favoriteButton.innerHTML = '♥';
+  favoriteButton.classList.add('favoriteButton');
+
+  favoriteButton.onclick = function() {
+    const favStatus = !restaurant.is_favorite;
+    DBHelper.updateFavStatus(restaurant.id, favStatus);
+    restaurant.is_favorite = favStatus;
+    //TODO: Change class/display for favorited icons
+    //favoriteButton.classList.add('favorited');
+  };
+
   const image = document.createElement('img');
   image.className = 'restaurant-img lazy';
   image.src = 'https://via.placeholder.com/350x150';
@@ -199,6 +211,8 @@ createRestaurantHTML = (restaurant) => {
   name.innerHTML = restaurant.name;
   li.append(name);
   addTabIndex(name);
+
+  li.append(favoriteButton);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;

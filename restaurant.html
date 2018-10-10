@@ -50,11 +50,22 @@
       <ul role="List" aria-label="reviews" id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
-    <section id='add-review'>
-      <button id='new-review'>Add Review></button>
+    <section class='add-review'>
+      <button onClick='toggleModal()' class='new-review'>Add Review</button>
     </section>
   </main>
   <!-- End main -->
+
+  <!-- Review Modal -->
+  <section class='review-modal hide'>
+    <!-- The action for this form will be a POST request with the review info -->
+    <form class='review-modal-content' method="post" enctype="multipart/form-data">
+      Username: <input type="text" name="username"><br>
+      Rating: <input type="number" name="rating" min="1" max="5">
+      Comments: <input type="text" name="comments"><br>
+      <input type="submit" value="Submit">
+    </form>
+  </section>
 
   <!-- Beginning footer -->
   <footer id="footer">

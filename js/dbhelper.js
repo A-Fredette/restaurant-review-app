@@ -34,6 +34,7 @@ class DBHelper {
           .then(response => {
             return response.json();
           }).then(data => {
+            console.log(data);
             data.forEach(location => {
               writeDatabaseKP('restaurants', location); //writes restaurants into indexedDb
             });
@@ -163,8 +164,22 @@ class DBHelper {
     else {
       return (`img/10.jpg`);
     }
-
   }
+
+  /**
+   * Restaurant image URL.
+   */
+   static updateFavStatus(id, status) {
+    console.log('favorite status changed to:', status);
+
+    fetch(`${DATABASE_URL}${id}/?isfavorite=${status}`, {
+      method: 'PUT'
+    })
+    .then((response) => {
+      console.log(response);
+    });
+    //TODO: Update indexDB restaurant favorite status
+   }
 
   /**
    * Map marker for a restaurant.

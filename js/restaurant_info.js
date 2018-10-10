@@ -174,3 +174,57 @@ getParameterByName = (name, url) => {
 addTabIndex = (element) => {
   element.tabIndex = 0;
 };
+
+/**
+ * Activating the new review modal
+ */
+const modal = document.querySelector('.review-modal');
+const reviewForm = document.querySelector('.review-modal-content');
+//var closeButton = document.querySelector(".close-button");
+
+toggleModal = () => {
+  if (modal.classList.contains('hide')) {
+    modal.classList.remove('hide');
+  } else {
+    modal.addClass('hide');
+  }
+};
+
+/**
+ * Send data via POST
+ */
+postReview = () => {
+  const id = getParameterByName('id');
+
+  fetch('http://localhost:1337/reviews/', {
+    method: 'post',
+    cache: 'no-cache',
+    mode: 'cors',
+      headers: {
+        'Content-Type': "multipart/form-data; boundary=00",
+      },
+    body: {
+    "restaurant_id": id,
+    "name": document.forms[0].elements[0].value,
+    "rating": document.forms[0].elements[1].value,
+    "comments": document.forms[0].elements[2].value
+    } 
+  }).then(response => {
+    return response.json();
+  }).then(response => {
+    console.log(response);
+  }).catch(error => console.error('POST error:', error));
+};
+
+/**
+ * Event listening on review form
+ */
+reviewForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  postReview();
+  reviewForm.reset();
+  modal.classList.add('hide');
+});
+
+
+
